@@ -9,13 +9,13 @@
 
 
 @section styles{
- 
+
 
 }
 
 @section scripts{
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
- 
+
+
     <script>
         var btn = document.getElementById('Guardar');
         $(document).ready(function () {
@@ -178,69 +178,90 @@
     </script>
 }
 
-<div class="page-title">
-    <div class="title_left">
-        <h3>Registro de Usuario</h3>
-    </div>
-
-    <div class="title_right">
-      
-    </div>
-</div>
-<div class="clearfix"></div>
 
 <div class="row">
-    <div class="col-md-12 col-sm-12  ">
-        <div class="x_panel">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="title">Registro de Usuario</h5>
+                    </div>
+
+                    <div class="col-sm-6" style="text-align: right">
+
+                        <a asp-page="/Usuarios/Index" class="nav-link text-dark" style="text-decoration: underline;"><i class="now-ui-icons arrows-1_minimal-left "></i>  Regresar</a>
+
+                    </div>
+                </div>
+
             
-            <div class="x_content">
+            </div>
+            <div class="card-body">
                 <form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row">
-                        <div class="col-md-4">
-                            <label for="fullname">Nombre:</label>
-                            <input type="text" id="fullname" class="form-control"   asp-for="Input.Nombre" required />
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="fullname" placeholder="Nombre" asp-for="Input.Nombre" required>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" class="form-control"   asp-for="Input.Email" required />
+                        <div class="col-md-5 pr-1">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="form-control" asp-for="Input.Email" required placeholder="Correo Electrónico">
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="rol">Rol:</label>
-                            <select id="heard" class="form-control" asp-for="Input.idRol" required>
-                                <option value="0">Seleccione</option>
-                                @foreach (var item in Model.Roles)
-                                {
-                                    <option value="@item.idRol">@item.NombreRol </option>
-                                }
-                            </select>
-                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label>Rol</label>
+                                <select id="heard" class="form-control" asp-for="Input.idRol" required>
+                                    <option value="0">Seleccione</option>
+                                    @foreach (var item in Model.Roles)
+                                    {
+                                        <option value="@item.idRol">@item.NombreRol </option>
+                                    }
+                                </select>
 
-
-                        <div class="col-md-6">
-                            <label for="clave">Contraseña:</label>
-                            <input class="form-control" asp-for="Input.Clave" id="clave" type="password" onchange="javascript: RevisaContraseña()" placeholder="Contraseña" />
-                            <span style="display:none;" id="ErrorClave" class="text-danger"></span>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="email">Confirmar Contraseña:</label>
-                            <input class="form-control" type="password" id="cClave" onchange="javascript: RevisaConfirmacionContraseña()" placeholder="Confirme la contraseña" />
-                            <span style="display:none;" id="ErrorConfirmacionClave" class="text-danger"></span>
-                        </div>
-
                     </div>
-                   
-                    <div class="clearfix"></div>
-                    <br />
-                             
-                            <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                         
-                     
+                    <div class="row">
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="clave">Contraseña</label>
+                                <input class="form-control" asp-for="Input.Clave" id="clave" type="password" onchange="javascript: RevisaContraseña()" placeholder="Contraseña">
+                                <span style="display:none;" id="ErrorClave" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="cClave">Confirmar Contraseña</label>
+                                <input class="form-control" type="password" id="cClave" onchange="javascript: RevisaConfirmacionContraseña()" placeholder="Confirme la contraseña">
+                                <span style="display:none;" id="ErrorConfirmacionClave" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label for="CodVendedor">Codigo Vendedor</label>
+                                <input type="text" id="CodVendedor" class="form-control" asp-for="Input.CodigoVendedor" required placeholder="Cod Vendedor SAP">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="submit" id="Guardar" class="btn btn-success">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-</div>
+            </div>
         </div>
     </div>
 </div>
-
-

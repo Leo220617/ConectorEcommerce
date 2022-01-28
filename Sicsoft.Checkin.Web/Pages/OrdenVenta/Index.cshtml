@@ -1,0 +1,247 @@
+﻿@page
+@model ConectorEcommerce.Pages.OrdenVenta.IndexModel
+@{
+    ViewData["Title"] = "Ordenes de Venta";
+}
+
+@using System.Globalization;
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+
+}
+
+
+@section styles{
+
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+@section scripts{
+
+
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+
+            });
+
+
+
+            $(document).ready(function () {
+                $('#tablita').DataTable();
+            });
+
+
+        });
+
+        function ProcesarSAP(id) {
+            $.ajax({
+                            type: 'POST',
+
+                            url: '@Url.Page("Index", "Generar")',
+                            dataType: 'text',
+                            data: { id: id },
+                            headers: {
+                                RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (json) {
+
+
+                                console.log("resultado " + json);
+                                if (json == "true") {
+                                    Swal.fire({
+                                        title: "Ha sido procesado con éxito",
+
+                                        icon: 'success',
+                                        showCancelButton: false,
+
+                                        confirmButtonText: 'OK',
+                                        customClass: {
+                                            confirmButton: 'swalBtnColor',
+
+                                        },
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.reload();
+                                        }
+                                    })
+
+                                } else {
+                                     
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Ha ocurrido un error al intentar procesar'
+
+                                    })
+                                }
+                            },
+
+                            beforeSend: function (xhr) {
+
+
+                            },
+                            complete: function () {
+
+                            },
+                            error: function (error) {
+                                 
+
+                            }
+                        });
+
+        }
+
+
+
+    </script>
+
+}
+@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+@inject IHttpContextAccessor httpContextAccessor
+
+
+<div class="row">
+    <div class="col-md-12   ">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Filtro</h4>
+
+            </div>
+            <div class="card-body">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-sm-4 pr-1">
+                            <div class="form-group">
+                                <label>Fecha Inicial</label>
+                                <input class="form-control" id="FecInicial" type="date" asp-for="filtro.FechaInicial">
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-4 pr-1">
+                            <div class="form-group">
+                                <label>Fecha Final</label>
+                                <input class="form-control" id="FecFinal" type="date" asp-for="filtro.FechaFinal">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 pl-1">
+
+                        </div>
+
+                        <div class="col-sm-12">
+                            <br />
+                        </div>
+
+
+                        <div class="col-sm-6 pr-1">
+                        </div>
+                        <div class="col-sm-6 pl-1" style="text-align: right;">
+                            <button title="Buscar" type="submit" class="btn btn btn-primary"> <i class="now-ui-icons ui-1_zoom-bold"></i></button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row">
+    <div class="col-md-12   ">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h4 class="card-title"> Ordenes de Venta</h4>
+                    </div>
+                    <div class="col-md-2">
+                        <a asp-page="Nuevo" class="btn btn-primary" title="Agregar">+  Agregar</a>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body table-responsive">
+
+                <table class="table" id="tablita">
+                    <thead class="text-primary">
+                        <tr>
+                            <th>Código</th>
+
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Procesada SAP</th>
+
+
+
+                        </tr>
+
+
+                    </thead>
+
+
+                    <tbody>
+                        @foreach (var item in Model.Ordenes)
+                        {
+                        <tr>
+                            <td><a asp-page="./Observar" asp-route-id="@item.id">@item.id</a> </td>
+                            <td>@item.CardCode - @item.Cliente</td>
+                            <td>@item.Fecha</td>
+                          
+                            <td align="right"> @decimal.Round(Convert.ToDecimal( item.Detalle.Sum(a => !a.TaxOnly ? (a.PrecioUnitario * a.Cantidad) - ((a.PrecioUnitario * a.Cantidad) * (a.PorcentajeDescuento/100)) + ((a.PrecioUnitario * a.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100)  )  : ((a.PrecioUnitario * a.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100))).ToString()),2).ToString("N", formato) </td>
+                            <td align="center">
+                                @{
+                                    if(!item.ProcesadaSAP)
+                {
+                    <img  src="~/sap.png" style="width: 20%;height: 20%; cursor: pointer;" title="Procesar a SAP" onclick="javascript: ProcesarSAP(@item.id)" />
+                }
+
+
+
+
+
+                             }
+                            
+                            
+                            </td>
+                        </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

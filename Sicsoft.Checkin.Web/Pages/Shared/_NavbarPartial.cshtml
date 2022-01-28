@@ -28,11 +28,70 @@
 <div class="sidebar-wrapper" id="sidebar-wrapper">
     <ul class="nav">
         <li>
-            <a href="./dashboard.html">
-                <i class="now-ui-icons design_app"></i>
-                <p>Dashboard</p>
-            </a>
+            @{if (!string.IsNullOrEmpty(Roles.Where(a => a == "1").FirstOrDefault()))
+                {
+                    <a asp-page="/Usuarios/Index">
+                        <i class="now-ui-icons users_single-02"></i>
+                        <p>Usuarios</p>
+                    </a>
+                }
+
+            }
+
         </li>
-       
+        <li>
+            @{if (!string.IsNullOrEmpty(Roles.Where(a => a == "6").FirstOrDefault()))
+                {
+                    <a asp-page="/Inventario/Index">
+                        <i class="now-ui-icons design_app"></i>
+                        <p>Inventario</p>
+                    </a>
+                }
+
+            }
+
+        </li>
+        <li>
+            @{if (!string.IsNullOrEmpty(Roles.Where(a => a == "7").FirstOrDefault()))
+                {
+                    <a asp-page="/Clientes/Index">
+                        <i class="now-ui-icons users_circle-08"></i>
+                        <p>Clientes</p>
+                    </a>
+                }
+
+            }
+
+        </li>
+
+        <li>
+            @{if (!string.IsNullOrEmpty(Roles.Where(a => a == "8").FirstOrDefault()))
+                {
+                    <a asp-page="/Bitacora/Index">
+                        <i class="now-ui-icons ui-2_settings-90"></i>
+                        <p>Bitacora Errores</p>
+                    </a>
+                }
+
+            }
+
+        </li>
+
+        <li>
+            @{if (!string.IsNullOrEmpty(Roles.Where(a => a == "9").FirstOrDefault()))
+                {
+                    <a asp-page="/OrdenVenta/Index">
+                        <i class="now-ui-icons business_briefcase-24"></i>
+                        <p>Ordenes</p>
+                    </a>
+                }
+
+            }
+
+        </li>
     </ul>
+
+
+
+
 </div>

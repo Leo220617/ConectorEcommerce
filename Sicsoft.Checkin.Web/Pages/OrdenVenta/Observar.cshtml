@@ -1,0 +1,274 @@
+﻿@page "{id}"
+@model ConectorEcommerce.Pages.OrdenVenta.ObservarModel
+@{
+    ViewData["Title"] = "Orden de Venta";
+}
+@using System.Globalization;
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+
+}
+@section styles{
+
+
+}
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+
+        });
+    </script>
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="title">Observar Orden</h5>
+
+
+
+                    </div>
+
+                    <div class="col-sm-6" style="text-align: right">
+
+                        <a asp-page="./Index" class="nav-link text-dark" style="text-decoration: underline;"><i class="now-ui-icons arrows-1_minimal-left "></i>  Regresar</a>
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-3 pr-1">
+                        <div class="form-group">
+                            <label>Vendedor</label>
+                            <input type="text" class="form-control" id="nVendedor" placeholder="Nombre Vendedor" asp-for="NombreVendedor" readonly>
+
+                            <input type="text" class="form-control" id="cVendedor" placeholder="Nombre Vendedor" asp-for="Orden.CodVendedor" hidden>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 pr-1">
+                        <div class="form-group">
+                            <label>Fecha Documento</label>
+                            <input type="date" class="form-control" id="fecha" asp-for="Orden.Fecha" readonly>
+
+
+                        </div>
+                    </div>
+                    <div class="col-md-3 pr-1">
+                        <div class="form-group">
+                            <label>Fecha Entrega</label>
+                            <input type="date" class="form-control" id="fechaE" placeholder="Nombre Vendedor" asp-for="Orden.FechaEntrega" readonly>
+
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 pl-1">
+                        <div class="form-group">
+                            <label>Fecha Contabilización</label>
+                            <input type="date" class="form-control" id="fechaV" placeholder="Nombre Vendedor" asp-for="Orden.FechaVencimiento" readonly>
+
+
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div class="col-md-4 pr-1">
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <br />
+                            <select id="cliente" class="form-control js-example-basic-single" style="width: 100%" asp-for="Orden.CardCode" disabled="disabled">
+                                <option value="0">Seleccione</option>
+                                @foreach (var item in Model.Clientes)
+                                {
+                                <option value="@item.CardCode">@item.CardCode - @item.CardName </option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 pr-1">
+                        <div class="form-group">
+                            <label>Tipo Documento</label>
+                            <br />
+                            <select id="tDocumento" class="form-control js-example-basic-single" style="width: 100%" asp-for="Orden.TipoDocumento" disabled="disabled">
+
+
+                                <option value="I" selected>Items</option>
+                                <option value="S">Servicio</option>
+
+
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4 pl-1">
+                        <div class="form-group">
+                            <label>Moneda</label>
+                            <input type="text" class="form-control" asp-for="Orden.Moneda" readonly>
+
+
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div class="col-md-4 pr-1">
+                        <div class="form-group">
+                            <label>Referencia de Factura</label>
+                            <input type="text" class="form-control" id="numAtCard" placeholder="Referencia" asp-for="Orden.NumAtCard" readonly>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="title">Productos</h5>
+            </div>
+            <div class="card-body">
+
+
+                <table class="table" id="tablita">
+                    <thead class="text-primary">
+                        <tr>
+
+                            <th align="left" style=" text-align: center;">Item</th>
+                            <th align="center" style=" text-align: center;">Cantidad </th>
+                            <th align="center" style=" text-align: center;">Precio </th>
+
+                            <th align="center" style=" text-align: center;">Descuento</th>
+                            <th align="center" style=" text-align: center;">Impuesto</th>
+                            <th align="center" style=" text-align: center;">Tax Only</th>
+
+                            <th align="center" style=" text-align: center;">Total</th>
+
+
+                        </tr>
+
+                    </thead>
+                    <tbody id="tbody">
+                        @foreach (var item in Model.Orden.Detalle)
+                        {
+                        <tr>
+
+                            <td align="left">@item.ItemCode - @(Model.Inventario.Where(a => a.ItemCode == item.ItemCode).FirstOrDefault() == null ? "": Model.Inventario.Where(a => a.ItemCode == item.ItemCode).FirstOrDefault().ItemName)</td>
+                            <td align="right">@decimal.Round(item.Cantidad, 2).ToString("N", formato)</td>
+                            <td align="right">@decimal.Round(item.PrecioUnitario, 2).ToString("N", formato) </td>
+
+                            <td align="right">@decimal.Round(item.PorcentajeDescuento, 2).ToString("N", formato) %</td>
+                            <td align="center">@item.Impuesto</td>
+                            <td align="right">@item.TaxOnly</td>
+                            <td align="right">@decimal.Round((item.PrecioUnitario * item.Cantidad) - ((item.PrecioUnitario * item.Cantidad) * (item.PorcentajeDescuento / 100)), 2).ToString("N", formato) </td>
+                            @*<td align="right"> @decimal.Round(Convert.ToDecimal((!item.TaxOnly ? (item.PrecioUnitario * item.Cantidad) - ((item.PrecioUnitario * item.Cantidad) * (item.PorcentajeDescuento / 100)) + ((item.PrecioUnitario * item.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == item.Impuesto).FirstOrDefault().Valor / 100)) : ((item.PrecioUnitario * item.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == item.Impuesto).FirstOrDefault().Valor / 100))).ToString()), 2).ToString("N", formato) </td>*@
+
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-sm-6 pr-1">
+
+                    </div>
+
+                    <div class="col-sm-6 pl-1 " style="text-align: right;">
+                        <div class="row">
+
+                            <div class="col-sm-12">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table; font-weight: 500 !important; font-style: normal;">SubTotal:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="subtotalG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">@decimal.Round(Model.Orden.Detalle.Sum(a => !a.TaxOnly ? a.Cantidad * a.PrecioUnitario: 0),2).ToString("N",formato)</label>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table;  font-weight: 500 !important; font-style: normal;"> Descuento:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="descuentoG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">@decimal.Round(Model.Orden.Detalle.Sum(a => !a.TaxOnly ? (a.Cantidad * a.PrecioUnitario) * (a.PorcentajeDescuento / 100)  : 0), 2).ToString("N", formato)</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table;  font-weight: 500 !important; font-style: normal;"> Impuesto:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="impuestoG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">@decimal.Round(Model.Orden.Detalle.Sum(a => ( (a.Cantidad * a.PrecioUnitario) - (a.Cantidad * a.PrecioUnitario) * (a.PorcentajeDescuento / 100)) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100) ), 2).ToString("N", formato)</label>
+                                            </td>
+
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="text-align: center;">
+                                                <label class="col-form-label" style="display: inline-table;  font-weight: bold !important; font-style: normal;"> Total:</label>
+
+                                            </td>
+                                            <td>
+                                                <label id="totalG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">@decimal.Round(Convert.ToDecimal(Model.Orden.Detalle.Sum(a => !a.TaxOnly ? (a.PrecioUnitario * a.Cantidad) - ((a.PrecioUnitario * a.Cantidad) * (a.PorcentajeDescuento / 100)) + (((a.PrecioUnitario * a.Cantidad) - ((a.Cantidad * a.PrecioUnitario) * (a.PorcentajeDescuento / 100)))* (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100)) : (((a.PrecioUnitario * a.Cantidad) - ((a.Cantidad * a.PrecioUnitario) * (a.PorcentajeDescuento / 100))) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100))).ToString()), 2).ToString("N", formato)</label>
+                                            </td>
+
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

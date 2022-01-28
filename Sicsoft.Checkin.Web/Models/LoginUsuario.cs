@@ -23,5 +23,8 @@ namespace Sicsoft.CostaRica.Checkin.Web.Models
         [StringLength(500)]
         public string Clave { get; set; }
 
+        [StringLength(2)]
+        public string CodigoVendedor { get; set; }
+
     }
 }

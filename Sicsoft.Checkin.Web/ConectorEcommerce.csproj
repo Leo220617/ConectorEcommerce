@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\css\tablas\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>

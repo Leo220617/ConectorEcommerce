@@ -55,18 +55,20 @@ namespace Sicsoft.Checkin.Web
 
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, resultado.id.ToString()));
-                identity.AddClaim(new Claim(ClaimTypes.Name, resultado.Email));
+                identity.AddClaim(new Claim(ClaimTypes.Name, resultado.Nombre));
                 identity.AddClaim(new Claim(ClaimTypes.UserData, resultado.token));
               
                 identity.AddClaim(new Claim(ClaimTypes.Role, resultado.idRol.ToString()));
                 identity.AddClaim(new Claim("Roles",str));
-               
+                identity.AddClaim(new Claim("CodVendedor", resultado.CodigoVendedor));
+                identity.AddClaim(new Claim("Vendedor", resultado.Nombre));
+
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                
+                return RedirectToPage("/OrdenVenta/Index");
 
-                return RedirectToPage("/Index");
+              
 
             }
             catch (ValidationApiException)

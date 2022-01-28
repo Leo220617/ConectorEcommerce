@@ -1,0 +1,174 @@
+﻿@page
+@model ConectorEcommerce.Pages.Clientes.IndexModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+@using System.Globalization;
+@{
+    NumberFormatInfo formato = new CultureInfo("en-US").NumberFormat;
+    formato.CurrencyGroupSeparator = ",";
+    formato.NumberDecimalSeparator = ".";
+
+
+}
+
+
+@section styles{
+
+    <style>
+        .tableFixHead th {
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+    </style>
+
+}
+@section scripts{
+
+
+    <script>
+        $(document).ready(function () {
+            jQuery(document).ready(function ($) {
+
+            });
+
+
+
+            $(document).ready(function () {
+                $('#tablita').DataTable();
+            });
+
+
+        });
+
+
+        function ActualizaCli(id) {
+            $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: '@Url.Page("Index", "ActualizaCliente")',
+                 data: { id: id },
+            success: function (result) {
+
+                console.log(result);
+
+                if (result.respuesta == 1) {
+                    Swal.fire({
+                        title: result.msj,
+
+                        icon: 'success',
+                        showCancelButton: false,
+
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'swalBtnColor',
+
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Ha ocurrido un error al intentar eliminar ' + result.msj
+
+                    })
+                }
+
+              
+
+
+
+            },
+            beforeSend: function () {
+
+            },
+            complete: function () {
+
+            }
+        });
+        }
+
+
+
+    </script>
+
+}
+@using Microsoft.AspNetCore.Http
+@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security.Claims;
+@using System.Threading.Tasks;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.Extensions.Configuration;
+@using Refit;
+@using Sicsoft.Checkin.Web.Models;
+@inject IHttpContextAccessor httpContextAccessor
+
+<div class="row">
+    <div class="col-md-12   ">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h4 class="card-title"> Clientes</h4>
+                    </div>
+                    <div class="col-md-2">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body table-responsive">
+
+                <table class="table" id="tablita">
+                    <thead class="text-primary">
+                        <tr>
+                            <th>Cod. SAP</th>
+                            <th>Nombre</th>
+                            <th>Identificación</th>
+                            <th>Email</th>
+                            <th>Acción</th>
+
+
+                        </tr>
+
+
+                    </thead>
+
+
+                    <tbody>
+                        @foreach (var item in Model.Cliente)
+                        {
+                        <tr>
+                            <td>@item.CardCode</td>
+                            <td>@item.CardName</td>
+                            <td>@item.Cedula</td>
+                            <td>@item.Email</td>
+                            <td>
+                                <button class="btn btn-primary" onclick="javascript: ActualizaCli('@item.CardCode') ">Actualizar</button>
+
+                            </td>
+
+
+
+                        </tr>
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>

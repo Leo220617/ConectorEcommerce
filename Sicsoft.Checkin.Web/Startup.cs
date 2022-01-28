@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using ConectorEcommerce.Models;
 using FacturaElectronica.Models;
 using InversionGloblalWeb.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -148,6 +149,27 @@ namespace Sicsoft.Checkin.Web
             services.AddRefitClient<ICrudApi<RecibidoRoles, int>>()
        .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Compras"))
        .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+
+            services.AddRefitClient<ICrudApi<InventarioViewModel, int>>()
+      .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Inventario"))
+      .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+            services.AddRefitClient<ICrudApi<ClientesViewModel, int>>()
+      .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Clientes"))
+      .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+            services.AddRefitClient<ICrudApi<BitacoraViewModel, int>>()
+      .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Bitacora"))
+      .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+            services.AddRefitClient<ICrudApi<OrdenVentaViewModel, int>>()
+     .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/OrdenVenta"))
+     .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+            services.AddRefitClient<ICrudApi<ImpuestosViewModel, int>>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Impuestos"))
+    .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
 
             return services;
         }

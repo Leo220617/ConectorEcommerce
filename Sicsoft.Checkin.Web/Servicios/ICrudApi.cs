@@ -51,8 +51,12 @@ namespace Sicsoft.Checkin.Web.Servicios
         [Get("/LeerBandejaEntrada")]
         Task LecturaBandejaEntrada();
 
+        [Get("/IngresarInventarioUno")]
+        Task<TEntity> ActualizarInventario(string id, string lp);
 
 
+        [Get("/IngresarClientesUno")]
+        Task<TEntity> ActualizarCliente<TQuery>(TQuery q);
 
         [Get("/Consultar")]
         Task<TEntity> ObtenerPorId(int id);

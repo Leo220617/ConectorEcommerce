@@ -1,0 +1,775 @@
+﻿@page
+@model ConectorEcommerce.Pages.OrdenVenta.NuevoModel
+@{
+    ViewData["Title"] = "Orden de Venta";
+}
+@using Newtonsoft.Json;
+@section styles
+{
+    <style>
+        .table > thead > tr > th {
+            font-size: 18px !important;
+        }
+    </style>
+
+
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+            onChangeCliente();
+
+        });
+
+
+        var ProdCadena = [];
+        var subtotal = 0;
+        var impuestos = 0;
+        var descuentos = 0;
+        var Productos = JSON.parse($("#Inventario").val());
+        var ImpuestosClaros = JSON.parse($("#ImpuestosClaros").val());
+        var Clientes = JSON.parse($("#Clientes").val());
+
+        function ValidarAntesTabla() {
+            if ($("#producto").val() == "0") {
+                return false;
+            } else if ($("#cantidad").val() <= 0) {
+                return false;
+            }
+            else if ($("#impuesto").val() == "0") {
+                return false;
+            }
+            else if ($("#precUnitario").val() < 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        function LimpiarDatos() {
+
+            $("#descuento").val(0);
+
+            $("#cantidad").val(1);
+            $("#precUnitario").val(1);
+            $("#producto").val("0").trigger('change.select2');
+            $("#impuesto").val("0").trigger('change.select2');
+
+            $("#comentario").val("");
+            document.getElementById("taxonly").checked = false;
+        }
+        function RellenaTabla() {
+            var sOptions = '';
+
+            $("#tbody").html('');
+
+            for (var i = 0; i < ProdCadena.length; i++) {
+                sOptions += '<tr>';
+
+                sOptions += '<td align="center" style="padding-top:13px;">    <a style="margin-left: -1%; position: inherit !important;" onclick = "javascript: EliminaProducto(' + i + ')" title="Eliminar" class="now-ui-icons ui-1_simple-remove"></a> ';
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:13px;">' + ProdCadena[i].nombre + '</p></td>';
+                sOptions += '<td align="center" style="padding-top:15px;">  <p style="font-size:13px;">' + formatoDecimal(ProdCadena[i].cantidad) + '</p></td>';
+                sOptions += '<td align="right" style="padding-top:15px;">  <p style="font-size:13px;">' + formatoDecimal(ProdCadena[i].descuento) + '% </p></td>';
+                sOptions += '<td align="center" style="padding-top:13px;">  <p style="font-size:13px;">' + ProdCadena[i].impuesto + '</p></td>';
+                sOptions += '<td align="right" style="padding-top:15px;">  <p style="font-size:13px;">' + formatoDecimal(ProdCadena[i].total) + '</p></td>';
+
+
+
+
+
+                sOptions += '</tr>'
+            }
+            $("#tbody").html(sOptions);
+        }
+
+        //Select de Productos
+        function onChangeCliente()
+        {
+            LimpiarDatos();
+            var idCliente = $("#cliente").val();
+            if (idCliente != "0") {
+                var ListaPrecio = Clientes.find(a => a.CardCode == idCliente).ListaPrecio;
+                var Prods = Productos.filter(a => a.ListaPrecio == ListaPrecio);
+                var categoriaAnterior = "";
+                console.log(Prods);
+                var sOptions = '';
+
+                $("#producto").html('');
+
+                sOptions += '<option value="0">Seleccione</option>';
+                for (var i = 0; i < Prods.length; i++) {
+
+                    if (categoriaAnterior != Prods[i].Categoria) {
+                        categoriaAnterior = Prods[i].Categoria;
+                        sOptions += ' <optgroup label="' + categoriaAnterior + '">  </optgroup>';
+                    }
+
+                    sOptions += ' <option value="' + Prods[i].id + '">  ' + Prods[i].ItemName + '</option>';
+
+
+
+
+
+
+
+                }
+
+                $("#producto").html(sOptions);
+            }
+
+        }
+
+        function onChangeProducto() {
+
+            if ($("#producto").val() != "0") {
+                var Precio = Productos.find(a => a.id == $("#producto").val()).Precio;
+
+                $("#precUnitario").val(parseInt(Precio));
+            }
+
+
+
+
+        }
+
+
+        //Agregar, Editar y Eliminar
+
+        function AgregarProducto()
+        {
+            if (ValidarAntesTabla()) {
+                var detalle = {
+                    id: $("#producto").val(),
+                    codigo: '',
+                    nombre: '',
+                    cantidad: $("#cantidad").val(),
+                    descuento: $("#descuento").val(),
+                    impuesto: $("#impuesto").val(),
+                    precioUnitario: $("#precUnitario").val(),
+
+                    taxonly: document.getElementById("taxonly").checked,
+                    total: 0
+
+                };
+
+                detalle.nombre = Productos.find(a => a.id == detalle.id).ItemName;
+                detalle.codigo = Productos.find(a => a.id == detalle.id).ItemCode;
+
+                if (!detalle.taxonly) {
+
+                    var subtotalL = detalle.cantidad * detalle.precioUnitario;
+                    var descuentosL = (subtotalL * detalle.descuento / 100);
+                    var impuestosL = ((subtotalL - descuentosL) * (ImpuestosClaros.find(a => a.Nombre == detalle.impuesto).Valor / 100));
+
+                    detalle.total = subtotalL - descuentosL + impuestosL;
+
+
+                    subtotal += subtotalL;
+                    descuentos += descuentosL;
+                    impuestos += impuestosL;
+                } else {
+                    var subtotalL = detalle.cantidad * detalle.precioUnitario;
+                    var descuentosL = (subtotalL * detalle.descuento / 100);
+                    var impuestosL = ((subtotalL - descuentosL) * (ImpuestosClaros.find(a => a.Nombre == detalle.impuesto).Valor / 100));
+
+                    detalle.total =  impuestosL;
+
+                    impuestos += impuestosL;
+                }
+
+
+
+                ProdCadena.push(detalle);
+
+                console.log(detalle);
+                LimpiarDatos();
+                ActualizaDatos();
+                RellenaTabla();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pareciera que aún falta un campo por llenar'
+
+                });
+            }
+
+
+
+        }
+
+        function EliminaProducto(campo) {
+            console.log("campo: " + campo);
+            Swal.fire({
+                title: '¿Desea eliminar este producto?',
+                showDenyButton: true,
+                showCancelButton: false,
+                confirmButtonText: `Aceptar`,
+                denyButtonText: `Cancelar`,
+                customClass: {
+                    confirmButton: 'swalBtnColor',
+                    denyButton: 'swalDeny'
+                },
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    console.log(ProdCadena[campo]);
+                    var subtotalL = ProdCadena[campo].cantidad * ProdCadena[campo].precioUnitario;
+                    var descuentosL = (subtotalL * ProdCadena[campo].descuento / 100);
+                    var impuestosL = ((subtotalL - descuentosL) * (ImpuestosClaros.find(a => a.Nombre == ProdCadena[campo].impuesto).Valor / 100));
+
+                    subtotal -= subtotalL;
+                    descuentos -= descuentosL;
+                    impuestos -= impuestosL;
+
+                    ProdCadena.splice(campo, 1);
+                    ActualizaDatos();
+                    RellenaTabla();
+                }
+            })
+
+        }
+
+
+
+        function ActualizaDatos() {
+            $("#subtotalG").text(formatoDecimal(Math.abs(subtotal)));
+            $("#descuentoG").text(formatoDecimal(Math.abs(descuentos)));
+            $("#impuestoG").text(formatoDecimal(Math.abs(impuestos)));
+            var total = subtotal - descuentos + impuestos;
+            $("#totalG").text(formatoDecimal(Math.abs(total)));
+
+
+
+
+        }
+
+        //validar
+        function validar(e) {
+            if (e.CardCode == "" || e.CardCode == null) {
+
+                return false;
+            } else if (e.Fecha == "" || e.Fecha == null) {
+                return false;
+            } else if (e.Moneda == "NULL") {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        //Generar
+         function Generar() {
+
+             let button = document.getElementById("Guardar");
+            var EncOrden =
+            {
+                CardCode: $("#cliente").val(),
+                Moneda: $("#moneda").val(),
+
+                Fecha: $("#fecha").val(),
+                FechaVencimiento: $("#fechaV").val(),
+                FechaEntrega: $("#fechaE").val(),
+                TipoDocumento: $("#tDocumento").val(),
+                NumAtCard: $("#numAtCard").val(),
+                Comentarios: $("#Comentario").val(),
+                CodVendedor: $("#cVendedor").val()
+               
+            };
+
+       
+
+ 
+
+
+            var DetOrden = ProdCadena;
+
+
+            var recibido = {
+                EncOrden,
+                DetOrden
+            }
+
+
+            console.log(JSON.stringify(recibido));
+
+             if (validar(EncOrden)) {
+                Swal.fire({
+                    title: '¿Desea guardar los cambios de esta orden de venta?',
+                    showDenyButton: true,
+                    showCancelButton: false,
+                    confirmButtonText: `Aceptar`,
+                    denyButtonText: `Cancelar`,
+                    customClass: {
+                        confirmButton: 'swalBtnColor',
+                        denyButton: 'swalDeny'
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        button.disabled = true;
+                        var recibidos = JSON.stringify(recibido);
+
+                        $.ajax({
+                            type: 'POST',
+
+                            url: '@Url.Page("Nuevo", "Generar")',
+                            dataType: 'text',
+                            data: { recibidos: recibidos.toString() },
+                            headers: {
+                                RequestVerificationToken: $('input:hidden[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (json) {
+
+                                 
+                                console.log("resultado " + json);
+                                if (json == "true") {
+                                    Swal.fire({
+                                        title: "Ha sido generado con éxito",
+
+                                        icon: 'success',
+                                        showCancelButton: false,
+
+                                        confirmButtonText: 'OK',
+                                        customClass: {
+                                            confirmButton: 'swalBtnColor',
+
+                                        },
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = window.location.href.split("/Nuevo")[0];
+                                        }
+                                    })
+
+                                } else {
+                                    button.disabled = false;
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Ha ocurrido un error al intentar guardar'
+
+                                    })
+                                }
+                            },
+
+                            beforeSend: function (xhr) {
+
+                                
+                            },
+                            complete: function () {
+                               
+                            },
+                            error: function (error) {
+                                button.disabled = false;
+                                
+                            }
+                        });
+                    }
+                })
+            } else {
+                button.disabled = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pareciera que aún falta un campo por llenar'
+
+                });
+            }
+
+        }
+
+
+    </script>
+
+
+
+}
+
+
+<form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+    <input hidden id="Inventario" value="@JsonConvert.SerializeObject(Model.Inventario)" />
+    <input hidden id="ImpuestosClaros" value="@JsonConvert.SerializeObject(Model.Impuestos)" />
+    <input hidden id="Clientes" value="@JsonConvert.SerializeObject(Model.Clientes)" />
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h5 class="title">Crear Orden</h5>
+
+
+                        </div>
+
+                        <div class="col-sm-6" style="text-align: right">
+
+                            <a asp-page="./Index" class="nav-link text-dark" style="text-decoration: underline;"><i class="now-ui-icons arrows-1_minimal-left "></i>  Regresar</a>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Vendedor</label>
+                                <input type="text" class="form-control" id="nVendedor" placeholder="Nombre Vendedor" asp-for="NombreVendedor" readonly>
+
+                                <input type="text" class="form-control" id="cVendedor" placeholder="Nombre Vendedor" asp-for="Orden.CodVendedor" hidden>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Fecha Documento</label>
+                                <input type="date" class="form-control" id="fecha" asp-for="Orden.Fecha">
+
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Fecha Entrega</label>
+                                <input type="date" class="form-control" id="fechaE" placeholder="Nombre Vendedor" asp-for="Orden.FechaEntrega">
+
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 pl-1">
+                            <div class="form-group">
+                                <label>Fecha Contabilización</label>
+                                <input type="date" class="form-control" id="fechaV" placeholder="Nombre Vendedor" asp-for="Orden.FechaVencimiento">
+
+
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label>Cliente</label>
+                                <br />
+                                <select id="cliente" class="form-control js-example-basic-single" style="width: 100%" onchange="javascript: onChangeCliente()" asp-for="Orden.CardCode" required>
+                                    <option value="0">Seleccione</option>
+                                    @foreach (var item in Model.Clientes)
+                                    {
+                                    <option value="@item.CardCode">@item.CardCode - @item.CardName </option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label>Tipo Documento</label>
+                                <br />
+                                <select id="tDocumento" class="form-control js-example-basic-single" style="width: 100%" asp-for="Orden.TipoDocumento" required>
+
+
+                                    <option value="I" selected>Items</option>
+                                    <option value="S">Servicio</option>
+
+
+                                </select>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label>Moneda</label>
+                                <br />
+                                <select id="moneda" class="form-control js-example-basic-single" style="width: 100%" asp-for="Orden.Moneda" required>
+
+
+                                    <option value="COL" selected>COL - Colones</option>
+                                    <option value="USD">USD- Dólares</option>
+
+
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label>Referencia de Factura</label>
+                                <input type="text" class="form-control" id="numAtCard" placeholder="Referencia" asp-for="Orden.NumAtCard" maxlength="50">
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">Productos</h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-10 pr-1">
+                            <div class="form-group">
+                                <label>Producto</label>
+                                <br />
+                                <select id="producto" onchange="javascript: onChangeProducto()"  style="width: 100%" class="form-control js-example-basic-single">
+                                    <option value="0">Seleccione</option>
+                                    @*@foreach (var item in Model.Inventario)
+                                {
+                                    <option value="@item.id"> @item.ItemName </option>
+                                }*@
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <br />
+
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Cantidad</label>
+                                <input type="number" class="form-control" id="cantidad" placeholder="Cantidad" value="1">
+
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-md-6 pr-1">
+                            <div class="form-group">
+                                <label>Impuesto</label>
+                                <br />
+                                <select id="impuesto" class="form-control js-example-basic-single"  style="width: 100%">
+                                    <option value="0">Seleccione</option>
+                                    @foreach (var item in Model.Impuestos)
+                                    {
+                                        <option value="@item.Nombre"> @item.Nombre </option>
+                                    }
+                                </select>
+
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-3 pl-1">
+                            <div class="form-group">
+                                <label>% Descuento</label>
+                                <input type="number" class="form-control" id="descuento" placeholder="Descuento" value="0">
+
+
+                            </div>
+
+
+                        </div>
+                        <br />
+
+                        <div class="col-md-5 pr-1">
+                            <div class="form-group">
+                                <label>Precio Unitario</label>
+                                <input type="number" class="form-control" id="precUnitario" placeholder="Descuento" value="0">
+
+
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-7 pl-1">
+                            <div class="form-check" style="margin-top: 13%;">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" id="taxonly">
+                                    <span class="form-check-sign"></span>
+                                    Solo Impuesto
+                                </label>
+                            </div>
+
+
+                        </div>
+
+                        <br />
+
+
+                        <div class="col-sm-7 pr-1"></div>
+                        <div class="col-sm-5 pl-1" style="text-align: right;">
+
+                            <a id="agregar" onclick="javascript: AgregarProducto();" class="btn btn-primary" style="color: white !important;">+ Agregar </a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="row">
+                 
+
+
+
+                    <div class="col-sm-12">
+                        <label class="col-form-label">Comentario:</label>
+                    </div>
+                    <div class="col-sm-12">
+
+                        <textarea rows="5" class="form-control" id="Comentario"></textarea>
+
+
+                    </div>
+
+
+
+
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">Listado de Productos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="table-responsive tableFixHead" style=" overflow-y:scroll;    z-index: 5; height: 300px;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th align="center" style=" text-align: center;">Eliminar</th>
+                                            <th align="center" style=" text-align: center;">Item</th>
+                                            <th align="center" style=" text-align: center;">Cantidad </th>
+                                            <th align="center" style=" text-align: center;">Descuento</th>
+                                            <th align="center" style=" text-align: center;">Impuesto</th>
+                                            <th align="center" style=" text-align: center;">Total</th>
+
+
+                                        </tr>
+
+                                    </thead>
+                                    <tbody id="tbody">
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-sm-6 pr-1">
+
+                        </div>
+
+                        <div class="col-sm-6 pl-1 " style="text-align: right;">
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="text-align: center;">
+                                                    <label class="col-form-label" style="display: inline-table; font-weight: 500 !important; font-style: normal;">SubTotal:</label>
+
+                                                </td>
+                                                <td>
+                                                    <label id="subtotalG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">0</label>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+
+                                                <td style="text-align: center;">
+                                                    <label class="col-form-label" style="display: inline-table;  font-weight: 500 !important; font-style: normal;"> Descuento:</label>
+
+                                                </td>
+                                                <td>
+                                                    <label id="descuentoG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">0</label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+
+                                                <td style="text-align: center;">
+                                                    <label class="col-form-label" style="display: inline-table;  font-weight: 500 !important; font-style: normal;"> Impuesto:</label>
+
+                                                </td>
+                                                <td>
+                                                    <label id="impuestoG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">0</label>
+                                                </td>
+
+
+                                            </tr>
+
+                                            <tr>
+
+                                                <td style="text-align: center;">
+                                                    <label class="col-form-label" style="display: inline-table;  font-weight: 500 !important; font-style: normal;"> Total:</label>
+
+                                                </td>
+                                                <td>
+                                                    <label id="totalG" style="display: inline-table;  font-weight: bold !important; font-style: normal;">0</label>
+                                                </td>
+
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</form>
+
+<div class="row">
+    <div class="col-md-6">
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group" style="text-align: right;">
+            <button type="submit" onclick="javascript: Generar()" id="Guardar" class="btn btn-success">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
