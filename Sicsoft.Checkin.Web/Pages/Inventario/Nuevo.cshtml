@@ -1,0 +1,148 @@
+﻿@page
+@model ConectorEcommerce.Pages.Inventario.NuevoModel
+@{
+    ViewData["Title"] = "Artículo Nuevo";
+}
+
+@section styles{
+
+
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+
+
+        });
+    </script>
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="title">Registro de Artículo</h5>
+                    </div>
+
+                    <div class="col-sm-6" style="text-align: right">
+
+                        <a asp-page="/Inventario/Index" class="nav-link text-dark" style="text-decoration: underline;"><i class="now-ui-icons arrows-1_minimal-left "></i>  Regresar</a>
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="card-body">
+                <form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Código</label>
+                                <input type="text" class="form-control" id="itemCode" placeholder="Item Code" asp-for="Input.ItemCode" required>
+                            </div>
+                        </div>
+                        <div class="col-md-5 pr-1">
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" class="form-control" asp-for="Input.ItemName" required placeholder="Nombre Artículo">
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label>Categorías</label>
+                                <select id="categoria" class="form-control js-example-basic-single" asp-for="Input.Categoria" required>
+                                    <option value="0">Seleccione</option>
+                                    @foreach (var item in Model.Categorias)
+                                    {
+                                        <option value="@item.idSAP">@item.Nombre </option>
+                                    }
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="cabys">Cod. Cabys</label>
+                                <input class="form-control" asp-for="Input.Cabys" id="cabys" type="text" placeholder="Cabys">
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label>Tipo IVA</label>
+                                <select id="iva" class="form-control js-example-basic-single" asp-for="Input.TipoIVA" required>
+                                    <option value="99">Pendiente</option>
+
+                                    <option value="1">IVA 1 </option>
+                                    <option value="2">IVA 2 </option>
+
+                                    <option value="3">IVA 13 </option>
+
+                                    <option value="4">EXE </option>
+
+
+
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label for="bodega">Bodega</label>
+                                <input type="text" id="bodega" class="form-control" asp-for="Input.WhsCode" required placeholder="Eje: 01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="precio">Precio</label>
+                                <input class="form-control" asp-for="Input.Precio" id="precio" type="number" placeholder="Precio Unitario">
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label>Moneda</label>
+                                <select id="moneda" class="form-control js-example-basic-single" asp-for="Input.Currency" required>
+                                    <option value="0">Seleccione</option>
+
+                                    <option value="COL">Colones </option>
+                                    <option value="USD"> Dólares </option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label for="list">Lista Precio</label>
+                                <input type="number" id="list" class="form-control" asp-for="Input.ListaPrecio" required placeholder="Eje: 1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="submit" id="Guardar" class="btn btn-success">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

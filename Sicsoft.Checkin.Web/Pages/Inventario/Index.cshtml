@@ -35,7 +35,7 @@
                 height: 'resolve'
             });
             jQuery(document).ready(function ($) {
-               
+
             });
 
 
@@ -114,7 +114,9 @@
 @using Sicsoft.Checkin.Web.Models;
 @inject IHttpContextAccessor httpContextAccessor
 
-
+@{
+    var Roles = ((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == "Roles").Select(s1 => s1.Value).FirstOrDefault().Split("|");
+}
 <div class="row">
     <div class="col-md-12   ">
         <div class="card">
@@ -130,7 +132,7 @@
                             <div class="form-group">
                                 <label>Categoría</label>
                                 <br />
-                                <select id="categorias"   style="width: 100%" class="form-control js-example-basic-single" asp-for="filtro.Categoria">
+                                <select id="categorias" style="width: 100%" class="form-control js-example-basic-single" asp-for="filtro.Categoria">
                                     <option value="0">Seleccione</option>
                                     @foreach (var item in Model.Categorias)
                                     {
@@ -143,7 +145,7 @@
                         </div>
 
                         <div class="col-sm-4 pr-1">
-                            
+
                         </div>
 
                         <div class="col-md-4 pl-1">
@@ -171,7 +173,7 @@
     </div>
 
 </div>
- 
+
 
 <div class="row">
     <div class="col-md-12   ">
@@ -182,7 +184,11 @@
                         <h4 class="card-title"> Inventario</h4>
                     </div>
                     <div class="col-md-2">
+                        @if (!string.IsNullOrEmpty(Roles.Where(a => a == "14").FirstOrDefault()))
+                        {
 
+                            <a asp-page="Nuevo" class="btn btn-primary" title="Agregar">+  Agregar</a>
+                        }
                     </div>
                 </div>
 
@@ -211,23 +217,23 @@
                     <tbody>
                         @foreach (var item in Model.Inventario)
                         {
-                        <tr>
-                            <td>@item.ItemCode</td>
-                            <td>@item.ItemName</td>
-                            <td>@item.Categoria</td>
-                            <td>@item.WhsCode</td>
-                            <td align="right">@decimal.Round(item.Stock.Value, 2).ToString("N", formato)</td>
-                            <td>@item.Currency</td>
-                            <td align="right">@decimal.Round(item.Total.Value, 2).ToString("N", formato)</td>
-                            <td>@item.ListaPrecio</td>
+                            <tr>
+                                <td>@item.ItemCode</td>
+                                <td>@item.ItemName</td>
+                                <td>@item.Categoria</td>
+                                <td>@item.WhsCode</td>
+                                <td align="right">@decimal.Round(item.Stock.Value, 2).ToString("N", formato)</td>
+                                <td>@item.Currency</td>
+                                <td align="right">@decimal.Round(item.Total.Value, 2).ToString("N", formato)</td>
+                                <td>@item.ListaPrecio</td>
 
-                            <td>
-                                <button class="btn btn-primary" onclick="javascript: ActualizaInv('@item.ItemCode', '@item.ListaPrecio') ">Actualizar</button>
+                                <td>
+                                    <button class="btn btn-primary" onclick="javascript: ActualizaInv('@item.ItemCode', '@item.ListaPrecio') ">Actualizar</button>
 
-                            </td>
+                                </td>
 
 
-                        </tr>
+                            </tr>
                         }
 
                     </tbody>

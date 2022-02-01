@@ -1,0 +1,103 @@
+﻿@page
+@model ConectorEcommerce.Pages.Clientes.NuevoModel
+@{
+    ViewData["Title"] = "Cliente Nuevo";
+}
+
+@section styles{
+
+
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2({
+                width: 'resolve',// need to override the changed default
+                height: 'resolve'
+            });
+            
+
+        });
+    </script>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h5 class="title">Registro de Cliente</h5>
+                    </div>
+
+                    <div class="col-sm-6" style="text-align: right">
+
+                        <a asp-page="/Clientes/Index" class="nav-link text-dark" style="text-decoration: underline;"><i class="now-ui-icons arrows-1_minimal-left "></i>  Regresar</a>
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="card-body">
+                <form method="post" id="formTipos" role="form" novalidate class="needs-validation " enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-3 pr-1">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="cardname" placeholder="Nombre" asp-for="Input.CardName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-5 pr-1">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="form-control" asp-for="Input.Email" required placeholder="Correo Electrónico">
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" placeholder="No. Teléfono" asp-for="Input.Telefono" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="ced">Cédula</label>
+                                <input class="form-control" asp-for="Input.Cedula" id="ced" type="text"  placeholder="No Cédula">
+                           
+                            </div>
+                        </div>
+                        <div class="col-md-4 pr-1">
+                            <div class="form-group">
+                                <label for="direccion">Dirección</label>
+                                <input class="form-control" type="text" id="direccion"  placeholder="Dirección" asp-for="Input.Direccion">
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 pl-1">
+                            <div class="form-group">
+                                <label for="listPrecios">Lista Precios</label>
+                                <input type="number" id="listPrecios" class="form-control" asp-for="Input.ListaPrecio" required placeholder="Eje: 1,2">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="submit" id="Guardar" class="btn btn-success">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

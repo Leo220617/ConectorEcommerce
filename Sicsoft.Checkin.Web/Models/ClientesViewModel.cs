@@ -13,9 +13,11 @@ namespace ConectorEcommerce.Models
         [StringLength(15)]
         public string CardCode { get; set; }
 
+        [Required]
         [StringLength(100)]
         public string CardName { get; set; }
 
+        [Required]
         [StringLength(100)]
         public string Email { get; set; }
 

@@ -80,7 +80,7 @@
                     })
                 }
 
-              
+
 
 
 
@@ -113,6 +113,11 @@
 @using Sicsoft.Checkin.Web.Models;
 @inject IHttpContextAccessor httpContextAccessor
 
+@{
+    var Roles = ((ClaimsIdentity)User.Identity).Claims.Where(d => d.Type == "Roles").Select(s1 => s1.Value).FirstOrDefault().Split("|");
+}
+
+
 <div class="row">
     <div class="col-md-12   ">
         <div class="card">
@@ -122,6 +127,11 @@
                         <h4 class="card-title"> Clientes</h4>
                     </div>
                     <div class="col-md-2">
+                        @if (!string.IsNullOrEmpty(Roles.Where(a => a == "13").FirstOrDefault()))
+                        {
+
+                            <a asp-page="Nuevo" class="btn btn-primary" title="Agregar">+  Agregar</a>
+                        }
 
                     </div>
                 </div>
@@ -148,19 +158,19 @@
                     <tbody>
                         @foreach (var item in Model.Cliente)
                         {
-                        <tr>
-                            <td>@item.CardCode</td>
-                            <td>@item.CardName</td>
-                            <td>@item.Cedula</td>
-                            <td>@item.Email</td>
-                            <td>
-                                <button class="btn btn-primary" onclick="javascript: ActualizaCli('@item.CardCode') ">Actualizar</button>
+                            <tr>
+                                <td>@item.CardCode</td>
+                                <td>@item.CardName</td>
+                                <td>@item.Cedula</td>
+                                <td>@item.Email</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="javascript: ActualizaCli('@item.CardCode') ">Actualizar</button>
 
-                            </td>
+                                </td>
 
 
 
-                        </tr>
+                            </tr>
                         }
 
                     </tbody>

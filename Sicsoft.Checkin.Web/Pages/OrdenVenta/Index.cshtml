@@ -217,7 +217,7 @@
                             <td>@item.CardCode - @item.Cliente</td>
                             <td>@item.Fecha</td>
                           
-                            <td align="right"> @decimal.Round(Convert.ToDecimal( item.Detalle.Sum(a => !a.TaxOnly ? (a.PrecioUnitario * a.Cantidad) - ((a.PrecioUnitario * a.Cantidad) * (a.PorcentajeDescuento/100)) + ((a.PrecioUnitario * a.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100)  )  : ((a.PrecioUnitario * a.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100))).ToString()),2).ToString("N", formato) </td>
+                            <td align="right"> @decimal.Round(Convert.ToDecimal( item.Detalle.Sum(a => !a.TaxOnly ? (a.PrecioUnitario * a.Cantidad) - ((a.PrecioUnitario * a.Cantidad) * (a.PorcentajeDescuento/100)) + (((a.PrecioUnitario * a.Cantidad) - ((a.PrecioUnitario * a.Cantidad) * (a.PorcentajeDescuento / 100))) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100)  )  : ((a.PrecioUnitario * a.Cantidad) * (Model.Impuestos.Where(b => b.Nombre == a.Impuesto).FirstOrDefault().Valor / 100))).ToString()),2).ToString("N", formato) </td>
                             <td align="center">
                                 @{
                                     if(!item.ProcesadaSAP)
