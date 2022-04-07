@@ -175,6 +175,10 @@ namespace Sicsoft.Checkin.Web
     .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/Categorias"))
     .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
 
+            services.AddRefitClient<ICrudApi<ListaPrecioViewModel, int>>()
+   .ConfigureHttpClient(c => c.BaseAddress = new Uri($"{Configuration["UrlWebApi"]}/api/ListaPrecios"))
+   .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
             return services;
         }
     }

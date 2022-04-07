@@ -14,19 +14,22 @@ namespace ConectorEcommerce.Pages.Inventario
     {
         private readonly ICrudApi<InventarioViewModel, int> items;
         private readonly ICrudApi<CategoriaViewModel, int> cats;
+        private readonly ICrudApi<ListaPrecioViewModel, int> lp;
 
 
         [BindProperty]
         public InventarioViewModel Input { get; set; }
+        [BindProperty]
+        public ListaPrecioViewModel[] ListaP { get; set; }
 
-        
         [BindProperty]
         public CategoriaViewModel[] Categorias { get; set; }
 
-        public NuevoModel(ICrudApi<InventarioViewModel, int> items, ICrudApi<CategoriaViewModel, int> cats)
+        public NuevoModel(ICrudApi<InventarioViewModel, int> items, ICrudApi<CategoriaViewModel, int> cats, ICrudApi<ListaPrecioViewModel, int> lp)
         {
             this.items = items;
             this.cats = cats;
+            this.lp = lp;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -38,6 +41,7 @@ namespace ConectorEcommerce.Pages.Inventario
             }
 
             Categorias = await cats.ObtenerLista("");
+            ListaP = await lp.ObtenerLista("");
             return Page();
         }
 

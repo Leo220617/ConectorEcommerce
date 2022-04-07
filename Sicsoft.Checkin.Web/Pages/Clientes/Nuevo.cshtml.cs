@@ -13,13 +13,19 @@ namespace ConectorEcommerce.Pages.Clientes
     public class NuevoModel : PageModel
     {
         private readonly ICrudApi<ClientesViewModel, int> cliente;
+        private readonly ICrudApi<ListaPrecioViewModel, int> lp;
+
 
         [BindProperty]
         public ClientesViewModel Input { get; set; }
+        
+        [BindProperty]
+        public ListaPrecioViewModel[] ListaP { get; set; }
 
-        public NuevoModel(ICrudApi<ClientesViewModel, int> cliente)
+        public NuevoModel(ICrudApi<ClientesViewModel, int> cliente, ICrudApi<ListaPrecioViewModel, int> lp)
         {
             this.cliente = cliente;
+            this.lp = lp;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -29,6 +35,7 @@ namespace ConectorEcommerce.Pages.Clientes
             {
                 return RedirectToPage("/NoPermiso");
             }
+            ListaP = await lp.ObtenerLista("");
             return Page();
         }
 
@@ -36,7 +43,7 @@ namespace ConectorEcommerce.Pages.Clientes
         {
             try
             {
-                Input.CardCode = Input.CardName;
+                Input.CardCode = Input.CardName.ToString().Substring(0,10);
                 await cliente.Agregar(Input);
                 return Redirect("./Index");
             }
