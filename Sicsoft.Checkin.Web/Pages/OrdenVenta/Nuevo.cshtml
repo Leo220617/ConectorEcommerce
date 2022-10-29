@@ -173,6 +173,7 @@
                     subtotal += subtotalL;
                     descuentos += descuentosL;
                     impuestos += impuestosL;
+
                 } else {
                     var subtotalL = detalle.cantidad * detalle.precioUnitario;
                     var descuentosL = (subtotalL * detalle.descuento / 100);
@@ -181,6 +182,7 @@
                     detalle.total =  impuestosL;
 
                     impuestos += impuestosL;
+                
                 }
 
 
